@@ -12,7 +12,10 @@ const cookieSession = require('cookie-session');
 const passport = require('passport');
 
 const app = express();
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended:true
+}))
 // use a json body parser
 app.use(bodyParser.json());
 
@@ -107,6 +110,19 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
 
+app.post('/api/submit', function(req, res) {
+  console.log(req.body);
+  const { Pool, Client } = require('pg');
+const connectionString = 'postgres://postgres:test@localhost:5432/dumbledoor';
+const pool = new Pool({connectionString: connectionString});
+
+pool.query(`insert into fake_data (address) values (${req.body.address}); `, (err, res) => {
+    console.log(err, res)
+  });
+
+  res.send('hello');
+
+})
 
 // Listen for requests on PORT 3000
 app.listen(3000);
